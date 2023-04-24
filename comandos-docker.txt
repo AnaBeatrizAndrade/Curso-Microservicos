@@ -1,0 +1,17 @@
+sudo docker run -d --name cursoms-keycloak -p 8081:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin --network cursoms-network quay.io/keycloak/keycloak:18.0.0 start-dev
+
+sudo docker run -it -d --name cursoms-rabbitmq -p 5672:5672 -p 15672:15672 --network cursoms-network rabbitmq:3.9-management
+
+sudo docker run --name cursoms-cartoes --network cursoms-network -e RABBITMQ_SERVER=cursoms-rabbitmq -e EUREKA_SERVER=cursoms-eureka -d cursoms-cartoes
+
+sudo docker run --name cursoms-clientes --network cursoms-network -e EUREKA_SERVER=cursoms-eureka -d cursoms-clientes
+
+sudo docker run --name cursoms-avaliadorcredito --network cursoms-network -e RABBITMQ_SERVER=cursoms-rabbitmq -e EUREKA_SERVER=cursoms-eureka -d cursoms-avaliadorcredito
+
+sudo docker run -d --name cursoms-gateway -p 8080:8080 -e EUREKA_SERVER=cursoms-eureka -e KEYCLOAK_SERVER=cursoms-keycloak -e KEYCLOAK_PORT=8080 --network cursoms-network cursoms-gateway
+
+sudo docker build --tag cursoms-gateway .
+
+sudo docker logs cursoms-cartoes
+
+Realm Settings -> Frontend URL=http://cursoms-keycloak:8080 (para funcionar com o Docker)
